@@ -7,62 +7,57 @@ const {
   Configuration,
   BatchInfo,
   BrowserType,
+  MatchLevel,
   DeviceName,
   ScreenOrientation,
   StitchMode,
-  RectangleSize
+  RectangleSize,
+  FileLogHandler
 } = require('@applitools/eyes-playwright');
 const fs = require('fs')
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
 
-function rFile(fname) {
-  try {
-    const data = fs.readFileSync(fname, 'utf8')
-    return data
-  } catch (err) {
-    console.error(err)
-  }
-}
-
+test.use({ headless: false });
 
 test.describe('ShoppingCart', () => {
-  let eyes, runner;
-  
+  let eyes, runner, configuration;
+
   test.beforeEach(async () => {
 
-     runner = new VisualGridRunner({
-       testConcurrency: 5
-     });
+    // Prepare the Eyes object
+    runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
-    const configuration = new Configuration();
-
+    configuration = new Configuration();
     configuration.setBatch(new BatchInfo('Shopping Cart (Playwright)'));
     configuration.addBrowser(1200, 900, BrowserType.CHROME);
     configuration.addBrowser(657, 900, BrowserType.CHROME);
-    configuration.setDisableBrowserFetching(false)
-    configuration.setViewportSize({width:1200,height:1200})
-
+    configuration.addBrowser(1200, 900, BrowserType.CHROME_ONE_VERSION_BACK);
+    configuration.addBrowser(657, 900, BrowserType.CHROME_ONE_VERSION_BACK);
+    configuration.addBrowser(1200, 900, BrowserType.FIREFOX);
+    configuration.addBrowser(657, 900, BrowserType.FIREFOX);
+    configuration.addBrowser(1200, 900, BrowserType.SAFARI);
+    configuration.addBrowser(657, 900, BrowserType.SAFARI);
+    configuration.setDisableBrowserFetching(true)
+    configuration.setIgnoreDisplacements(true)
+    configuration.setViewportSize({ width: 1200, height: 1393 })
+    configuration.setBranchName('Shopping Cart (Playwright) 9')
+    configuration.setBaselineBranchName('Shopping Cart (Playwright) 9')
+    configuration.setApiKey('i6qXgcxIfvnIb110E6nFdHhUbFeNMeFHSvexv1NM0HIjQ110')
     eyes.setConfiguration(configuration);
+
+    eyes.setLogHandler(new FileLogHandler(true));
 
   });
 
-  test('Main Menu', async ({ page }) => {
-  
-
+  async function theTest(page, changes) {
+    // Open the eyes test and pass in a reference to the bwoser
     await eyes.open(page, 'Shopping Cart (Playwright) app', 'Shopping Cart (Playwright) test');
-
 
     // Go to http://j2store.net/demo/index.php
     await page.goto('http://j2store.net/demo/index.php');
 
-
-    //await page.evaluate(rFile('test/aligncenter.js'))
-    await page.evaluate(rFile('test/replaceValue.js'))
-
+    await evalChange(page, changes)
 
     await eyes.check('Step 1', Target.window().fully());
     // Click #t3-mainnav >> text=Hats
@@ -73,7 +68,7 @@ test.describe('ShoppingCart', () => {
     await eyes.check('Step 3', Target.window().fully());
     // Click text=Add to cart
     await page.click('text=Add to cart');
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(1500)
     await eyes.check('Step 4', Target.window().fully());
     // Click #t3-mainnav >> text=Kettles
     await page.hover('#t3-mainnav > div > div > div.col-sm-4.col-xs-4.col-md-4 > div.t3-navbar.navbar-collapse.collapse > div > ul > li:nth-child(2)')
@@ -82,25 +77,21 @@ test.describe('ShoppingCart', () => {
     await eyes.check('Step 6', Target.window().fully());
     // Click text=Add to cart
     await page.click('text=Add to cart');
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 7', Target.window().fully());
     // Click #j2store_cart_item_123 >> text=Checkout
     await page.hover('#t3-mainnav > div > div > div.col-sm-4.col-xs-8.col-md-4 > div > div.j2store_cart_module_123 > div > div.j2store-cart-info > div')
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 8', Target.window().fully());
     await page.click('#j2store_cart_item_123 >> text=Checkout');
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 9', Target.window().fully());
     // Click text=Continue
 
-
-
-   // await page.evaluate(rFile('test/aligncenter.js'))
-   await page.evaluate(rFile('test/replaceValue.js'))
-
+    await evalChange(page, changes)
 
     await page.click('text=Continue');
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 10', Target.window().fully());
     // Click input[name="first_name"]
     await page.click('input[name="first_name"]');
@@ -150,11 +141,11 @@ test.describe('ShoppingCart', () => {
     await page.click('#onCheckoutPayment_wrapper > label.payment-plugin-image-label.payment_cash > input');
     // Click input[name="payment_plugin"]
     await page.click('input[name="payment_plugin"]');
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 12', Target.window().fully());
     // Click text=Shipping & Payment Methods Select a payment method Cash on Delivery Money Order  >> input[type="button"]
     await page.click('text=Shipping & Payment Methods Select a payment method Cash on Delivery Money Order  >> input[type="button"]');
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 13', Target.window().fully());
     // Click text=Place order
     await Promise.all([
@@ -162,7 +153,7 @@ test.describe('ShoppingCart', () => {
       page.click('text=Place order')
     ]);
     // Click text=Go to order history
-    await page.waitForTimeout(3000)
+    await page.waitForTimeout(2500)
     await eyes.check('Step 14', Target.window().fully());
     await page.click('text=Go to order history');
     // Click text=Downloads
@@ -171,18 +162,76 @@ test.describe('ShoppingCart', () => {
     await page.click('text=Address');
 
     await eyes.check('Step 15', Target.window().fully());
-    
-    await page.waitForTimeout(3000)
-    await page.evaluate('var h = document.createElement("H1");h.style.cssText = "font-family:Arial,Helvetica,sans-serif;position:absolute;top:300px;left:450px;z-index:100";var t = document.createTextNode("Wait for Applitools render");h.appendChild(t);document.body.appendChild(h);')
+
+    // Please Wait page
+    page.goto('https://chemerson.github.io/utility-webpages/applitools_is_working.html')
+
+    // clear cookies for next test
+    let context = page.context()
+    context.clearCookies()
 
     await eyes.close(false);
 
+    const results = await runner.getAllTestResults(false);
+    await console.log('Applitools Results', results);
 
-  });
+  }
 
   test.afterEach(async () => {
-    await eyes.abort();
-    const results = await runner.getAllTestResults(false);
-    console.log('Applitools Results', results);
+    console.log('Done')
   });
+
+  test.afterAll(async () => {
+
+  })
+
+  ////////////////////////////////////////////////////////////
+  test.skip('Check out', async ({ page }) => {
+    await theTest(page, 0)
+  });
+
+  test.skip('Check out Cross Browser', async ({ page }) => {
+    // compare all previous runs to Chrome 1200x900
+    configuration.setBaselineEnvName('Chrome1200')
+    configuration.setMatchLevel(MatchLevel.Layout2);
+    eyes.setConfiguration(configuration);
+    await theTest(page, 2)
+  });
+
+  test.skip('Check out 2', async ({ page }) => {
+    await theTest(page, 1)
+  });
+
+  test.skip('Check out 3', async ({ page }) => {
+    await theTest(page, 2)
+  });
+  ////////////////////////////////////////////////////////////
+
+  async function evalChange(page, change) {
+    switch (change) {
+      case 1:
+        await page.evaluate(rFile('test/changers/aligncenter.js'))
+        break
+      case 2:
+        await page.evaluate(rFile('test/changers/replaceValue.js'))
+        break
+      default:
+
+    }
+  }
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
+  function rFile(fname) {
+    try {
+      const data = fs.readFileSync(fname, 'utf8')
+      return data
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+
 });
