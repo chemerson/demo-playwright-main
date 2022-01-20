@@ -54,7 +54,7 @@ test.describe('test template', () => {
   });
 
   ////////////////////////////////////////////////////////////
-  test.skip('test 1', async ({ page }) => {
+  test('test 1', async ({ page }) => {
     await theTest(page, 0)
   });
 
@@ -76,9 +76,9 @@ test.describe('test template', () => {
 
     await evalChange(page, changes) // inject page change to simulate A/B tessting or diff
 
-    //await eyes.check('Step 1', Target.window().fully());
+    await eyes.check('Step 1', Target.window().fully());
 
-    await eyes.check('Step 1', Target.window().fully().variationGroupId('id1'));
+    //await eyes.check('Step 1', Target.window().fully().variationGroupId('id1'));
     
     await eyes.check('Step 2', Target.window().fully());
 
