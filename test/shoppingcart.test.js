@@ -43,7 +43,7 @@ test.describe('ShoppingCart', () => {
     configuration.setViewportSize({ width: 1200, height: 1393 })
     configuration.setBranchName('Shopping Cart (Playwright) 9')
     configuration.setBaselineBranchName('Shopping Cart (Playwright) 9')
-    configuration.setApiKey('i6qXgcxIfvnIb110E6nFdHhUbFeNMeFHSvexv1NM0HIjQ110')
+    configuration.setApiKey(process.env.APPLITOOLS_API_KEY)
     eyes.setConfiguration(configuration);
 
     eyes.setLogHandler(new FileLogHandler(true));
