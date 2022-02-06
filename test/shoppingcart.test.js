@@ -28,22 +28,29 @@ test.describe('ShoppingCart', () => {
     runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
+    let branchName = 'Shopping Cart (Playwright) 990'
+    let batchName = 'Shopping Cart (Playwright)'
+
     configuration = new Configuration();
-    configuration.setBatch(new BatchInfo('Shopping Cart (Playwright)'));
-    configuration.addBrowser(1200, 900, BrowserType.CHROME);
-    configuration.addBrowser(657, 900, BrowserType.CHROME);
-    configuration.addBrowser(1200, 900, BrowserType.CHROME_ONE_VERSION_BACK);
-    configuration.addBrowser(657, 900, BrowserType.CHROME_ONE_VERSION_BACK);
-    configuration.addBrowser(1200, 900, BrowserType.FIREFOX);
-    configuration.addBrowser(657, 900, BrowserType.FIREFOX);
-    configuration.addBrowser(1200, 900, BrowserType.SAFARI);
-    configuration.addBrowser(657, 900, BrowserType.SAFARI);
-    configuration.setDisableBrowserFetching(true)
-    configuration.setIgnoreDisplacements(true)
-    configuration.setViewportSize({ width: 1200, height: 1393 })
-    configuration.setBranchName('Shopping Cart (Playwright) 9')
-    configuration.setBaselineBranchName('Shopping Cart (Playwright) 9')
-    configuration.setApiKey('i6qXgcxIfvnIb110E6nFdHhUbFeNMeFHSvexv1NM0HIjQ110')
+    configuration
+      .setBatch(new BatchInfo('Shopping Cart (Playwright)'))
+      .setDisableBrowserFetching(true)
+      .setIgnoreDisplacements(true)
+      .setViewportSize({ width: 1200, height: 1393 })
+      .setBranchName(branchName)
+      .setBaselineBranchName(branchName)
+      .setWaitBeforeCapture(1500)
+      .setApiKey(process.env.APPLITOOLS_API_KEY)
+
+      // Define browsers for UFG by breakpoint
+      let breakpoints = [1200, 896, 640, 530]
+      breakpoints.forEach(element => {
+        configuration
+          .addBrowser(element, 800, BrowserType.CHROME)
+          .addBrowser(element, 800, BrowserType.FIREFOX)
+          .addBrowser(element, 800, BrowserType.SAFARI)
+      })
+      
     eyes.setConfiguration(configuration);
 
     eyes.setLogHandler(new FileLogHandler(true));
@@ -65,6 +72,9 @@ test.describe('ShoppingCart', () => {
     await eyes.check('Step 2', Target.window().fully());
     await page.click('#t3-mainnav >> text=Hats');
     await page.waitForLoadState('networkidle');
+
+    await evalChange(page, changes)
+    
     await eyes.check('Step 3', Target.window().fully());
     // Click text=Add to cart
     await page.click('text=Add to cart');
@@ -153,7 +163,7 @@ test.describe('ShoppingCart', () => {
       page.click('text=Place order')
     ]);
     // Click text=Go to order history
-    await page.waitForTimeout(2500)
+    await page.waitForTimeout(1_000)
     await eyes.check('Step 14', Target.window().fully());
     await page.click('text=Go to order history');
     // Click text=Downloads
@@ -186,7 +196,7 @@ test.describe('ShoppingCart', () => {
   })
 
   ////////////////////////////////////////////////////////////
-  test.skip('Check out', async ({ page }) => {
+  test('Check out', async ({ page }) => {
     await theTest(page, 0)
   });
 
@@ -215,6 +225,9 @@ test.describe('ShoppingCart', () => {
       case 2:
         await page.evaluate(rFile('test/changers/replaceValue.js'))
         break
+      case 3:
+          await page.evaluate(rFile('test/changers/color-change.js'))
+          break
       default:
 
     }

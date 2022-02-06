@@ -28,25 +28,31 @@ test.describe('test template', () => {
     runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
-    let branchName = 'branch 123'
-    let batchName = 'test batch'
+    let branchName = 'Demo Batch 123'
+    let batchName = 'Applitools Demo'
 
     configuration = new Configuration();
-    configuration.setBatch(new BatchInfo(batchName));
-    configuration.addBrowser(1200, 900, BrowserType.CHROME);
-    configuration.addBrowser(657, 900, BrowserType.CHROME);
-    configuration.addBrowser(1200, 900, BrowserType.CHROME_ONE_VERSION_BACK);
-    configuration.addBrowser(657, 900, BrowserType.CHROME_ONE_VERSION_BACK);
-    configuration.addBrowser(1200, 900, BrowserType.FIREFOX);
-    configuration.addBrowser(657, 900, BrowserType.FIREFOX);
-    configuration.addBrowser(1200, 900, BrowserType.SAFARI);
-    configuration.addBrowser(657, 900, BrowserType.SAFARI);
-    configuration.setDisableBrowserFetching(true)
-    configuration.setIgnoreDisplacements(true)
-    configuration.setViewportSize({ width: 1200, height: 1393 })
-    configuration.setBranchName(branchName)
-    configuration.setBaselineBranchName(branchName)
-    configuration.setApiKey('IVATJb9JJqGfzLDJ6p3eWtU4hUsOO5rAFmciVSi4qtk110')
+    configuration
+      .setBatch(new BatchInfo(batchName))
+      .setDisableBrowserFetching(true)
+      .setIgnoreDisplacements(true)
+      .setViewportSize({ width: 1200, height: 1393 })
+      .setBranchName(branchName)
+      .setBaselineBranchName(branchName)
+      .setApiKey(process.env.APPLITOOLS_API_KEY)
+      .setWaitBeforeCapture(500)
+      .setWaitBeforeScreenshots(500)
+
+
+    // Define browsers for UFG by breakpoint
+    let breakpoints = [1080, 896, 640, 530]
+    breakpoints.forEach(element => {
+      configuration
+        .addBrowser(element, 800, BrowserType.CHROME)
+        .addBrowser(element, 800, BrowserType.FIREFOX)
+        .addBrowser(element, 800, BrowserType.SAFARI)
+    })
+    
     eyes.setConfiguration(configuration);
 
     eyes.setLogHandler(new FileLogHandler(true));
@@ -54,8 +60,8 @@ test.describe('test template', () => {
   });
 
   ////////////////////////////////////////////////////////////
-  test('test 1', async ({ page }) => {
-    await theTest(page, 0)
+  test.skip('test 1', async ({ page }) => {
+    await theTest(page, 0, 2)
   });
 
   test.skip('cross browser compare 1', async ({ page }) => {
@@ -63,16 +69,30 @@ test.describe('test template', () => {
     configuration.setBaselineEnvName('Chrome1200')
     configuration.setMatchLevel(MatchLevel.Layout2);
     eyes.setConfiguration(configuration);
-    await theTest(page, 2)
+    await theTest(page, 2, 1)
   });
   ////////////////////////////////////////////////////////////
 
-  async function theTest(page, changes) {
+  async function theTest(page, changes, baseurl) {
     // Open the eyes test and pass in a reference to the bwoser
-    await eyes.open(page, 'app', 'test');
+    await eyes.open(page, 'Demo app', 'Login Page');
 
-    await page.goto('https://demo.applitools.com/');
-    // await page.goto('https://demo.applitools.com/app.html');
+    let testurl = 'http://applitoolsdemo.eastus.cloudapp.azure.com/demo.html'
+    switch (testurl) {
+      case 1 :
+        testurl += '?version=1'
+        break
+      case 2 :
+        testurl += '?version=1&changelogo=true' 
+        break 
+      case 3 :
+        testurl += '?version=2'
+        break
+      default :
+    }
+      
+
+    await page.goto(testurl);
 
     await evalChange(page, changes) // inject page change to simulate A/B tessting or diff
 
