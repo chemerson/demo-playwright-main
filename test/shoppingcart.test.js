@@ -28,27 +28,32 @@ test.describe('ShoppingCart', () => {
     runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
-    let branchName = 'Shopping Cart (Playwright) 990'
+    let branchName = 'Shopping Cart (Playwright) 035'
     let batchName = 'Shopping Cart (Playwright)'
 
     configuration = new Configuration();
     configuration
       .setBatch(new BatchInfo('Shopping Cart (Playwright)'))
-      .setDisableBrowserFetching(true)
-      .setIgnoreDisplacements(true)
+      .setDisableBrowserFetching(false)
+      .setIgnoreDisplacements(false)
       .setViewportSize({ width: 1200, height: 1393 })
       .setBranchName(branchName)
       .setBaselineBranchName(branchName)
-      .setWaitBeforeCapture(1500)
+      .setWaitBeforeCapture(1_500)
+      .setWaitBeforeScreenshots(1_000)
       .setApiKey(process.env.APPLITOOLS_API_KEY)
+      .setForceFullPageScreenshot(true)
 
       // Define browsers for UFG by breakpoint
       let breakpoints = [1200, 896, 640, 530]
+      // let breakpoints = [1200]
       breakpoints.forEach(element => {
         configuration
-          .addBrowser(element, 800, BrowserType.CHROME)
-          .addBrowser(element, 800, BrowserType.FIREFOX)
-          .addBrowser(element, 800, BrowserType.SAFARI)
+          .addBrowser(element, 900, BrowserType.CHROME)
+          .addBrowser(element, 900, BrowserType.FIREFOX)
+          .addBrowser(element, 900, BrowserType.SAFARI)
+          .addBrowser(element, 900, BrowserType.EDGE_CHROMIUM)
+
       })
       
     eyes.setConfiguration(configuration);
@@ -84,6 +89,7 @@ test.describe('ShoppingCart', () => {
     await page.hover('#t3-mainnav > div > div > div.col-sm-4.col-xs-4.col-md-4 > div.t3-navbar.navbar-collapse.collapse > div > ul > li:nth-child(2)')
     await eyes.check('Step 5', Target.window().fully());
     await page.click('#t3-mainnav >> text=Kettles');
+    await evalChange(page, changes)
     await eyes.check('Step 6', Target.window().fully());
     // Click text=Add to cart
     await page.click('text=Add to cart');
@@ -203,9 +209,9 @@ test.describe('ShoppingCart', () => {
   test.skip('Check out Cross Browser', async ({ page }) => {
     // compare all previous runs to Chrome 1200x900
     configuration.setBaselineEnvName('Chrome1200')
-    configuration.setMatchLevel(MatchLevel.Layout2);
+    configuration.setMatchLevel(MatchLevel.Strict);
     eyes.setConfiguration(configuration);
-    await theTest(page, 2)
+    await theTest(page, 0)
   });
 
   test.skip('Check out 2', async ({ page }) => {
@@ -213,7 +219,7 @@ test.describe('ShoppingCart', () => {
   });
 
   test.skip('Check out 3', async ({ page }) => {
-    await theTest(page, 2)
+    await theTest(page, 0)
   });
   ////////////////////////////////////////////////////////////
 
