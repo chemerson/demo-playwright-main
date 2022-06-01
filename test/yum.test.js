@@ -28,8 +28,8 @@ test.describe('test template', () => {
     runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
-    let branchName = 'Demo Batch 123'
-    let batchName = 'Applitools Demo'
+    let branchName = 'Demo Batch Yum 123'
+    let batchName = 'Yum'
 
     configuration = new Configuration();
     configuration
@@ -60,7 +60,7 @@ test.describe('test template', () => {
   });
 
   ////////////////////////////////////////////////////////////
-  test.skip('test 1', async ({ page }) => {
+  test('test 1', async ({ page }) => {
     await theTest(page, 0, 2)
   });
 
@@ -77,20 +77,7 @@ test.describe('test template', () => {
     // Open the eyes test and pass in a reference to the bwoser
     await eyes.open(page, 'Demo app', 'Login Page');
 
-    let testurl = 'http://applitoolsdemo.eastus.cloudapp.azure.com/demo.html'
-    switch (testurl) {
-      case 1 :
-        testurl += '?version=1'
-        break
-      case 2 :
-        testurl += '?version=1&changelogo=true' 
-        break 
-      case 3 :
-        testurl += '?version=2'
-        break
-      default :
-    }
-      
+    let testurl = 'https://testprocess.coaliance.com/login/login#!/'
 
     await page.goto(testurl);
 
@@ -98,9 +85,57 @@ test.describe('test template', () => {
 
     await eyes.check('Step 1', Target.window().fully());
 
-    //await eyes.check('Step 1', Target.window().fully().variationGroupId('id1'));
-    
+    // Click [placeholder="enter username"]
+    await page.locator('[placeholder="enter username"]').click();
+
+    // Fill [placeholder="enter username"]
+    await page.locator('[placeholder="enter username"]').fill('txs4706');
+
+    // Click [placeholder="enter password"]
+    await page.locator('[placeholder="enter password"]').click();
+
+    // Fill [placeholder="enter password"]
+    await page.locator('[placeholder="enter password"]').fill('YumYum1@');
+
+    // Click .layout-block.button >> nth=0
+    await Promise.all([
+      page.waitForNavigation(/*{ url: 'https://testprocess.coaliance.com/' }*/),
+      page.locator('.layout-block.button').first().click()
+    ]);
+
+    // Go to https://testprocess.coaliance.com/#dashboard
+    await page.goto('https://testprocess.coaliance.com/#dashboard');
+
+    // Go to https://testprocess.coaliance.com/#manager%20workbook?orgUnitId=1&date=
+    await page.goto('https://testprocess.coaliance.com/#manager%20workbook?orgUnitId=1&date=');
+
+    // Go to https://testprocess.coaliance.com/#dashboard/dashboard?unitId=1&id=01d3992b-c3f7-452e-a930-48592f759140&date=2022-05-31
+    await page.goto('https://testprocess.coaliance.com/#dashboard/dashboard?unitId=1&id=01d3992b-c3f7-452e-a930-48592f759140&date=2022-05-31');
+
+    // Go to https://testprocess.coaliance.com/#manager%20workbook?orgUnitId=1&date=05/31/2022
+    await page.goto('https://testprocess.coaliance.com/#manager%20workbook?orgUnitId=1&date=05/31/2022');
+
+    // Click text=Log Search
+    await page.locator('text=Log Search').click();
+
+    // Click span:has-text("Manager Workbench")
+    await page.locator('span:has-text("Manager Workbench")').click();
+
+    // Click text=Log Search
+    await page.locator('text=Log Search').click();
+
+    // Click span:has-text("Manager Workbench")
+    await page.locator('span:has-text("Manager Workbench")').click();
+
+    // Click text=Log Search
+    await page.locator('text=Log Search').click();
+
+    // Click span:has-text("Manager Workbench")
+    await page.locator('span:has-text("Manager Workbench")').click();
+
+
     await eyes.check('Step 2', Target.window().fully());
+
 
     // Please Wait page
     page.waitForTimeout(2500)

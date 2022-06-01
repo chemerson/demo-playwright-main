@@ -28,7 +28,7 @@ test.describe('ShoppingCart', () => {
     runner = new VisualGridRunner({ testConcurrency: 100 });
     eyes = new Eyes(runner);
 
-    let branchName = 'Shopping Cart (Playwright) 035'
+    let branchName = 'Shopping Cart (Playwright) 0651'
     let batchName = 'Shopping Cart (Playwright)'
 
     configuration = new Configuration();
@@ -56,9 +56,9 @@ test.describe('ShoppingCart', () => {
 
       })
       
-    eyes.setConfiguration(configuration);
+    eyes.setConfiguration(configuration)
 
-    eyes.setLogHandler(new FileLogHandler(true));
+    eyes.setLogHandler(new FileLogHandler(true))
 
   });
 
@@ -202,7 +202,7 @@ test.describe('ShoppingCart', () => {
   })
 
   ////////////////////////////////////////////////////////////
-  test('Check out', async ({ page }) => {
+  test.skip('Check out', async ({ page }) => {
     await theTest(page, 0)
   });
 

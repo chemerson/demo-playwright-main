@@ -14,14 +14,13 @@
   "bugs": {
     "url": "https://github.com/applitools/tutorial-playwright/issues"
   },
-  "dependencies": {},
   "scripts": {
     "test": "playwright test --headed --browser chromium"
   },
   "license": "MIT",
   "devDependencies": {
-    "@applitools/eyes-playwright": "^1.11.1",
-    "@playwright/test": "^1.17.1",
-    "playwright": "^1.17.1"
+    "@applitools/eyes-playwright": "^1.11.4",
+    "@playwright/test": "^1.22.2",
+    "playwright": "^1.22.2"
   }
 }
